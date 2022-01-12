@@ -1,0 +1,82 @@
+version: '3.7'
+
+services:
+  app:
+    container_name: app
+    image: node:16-alpine
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - 3000:3000
+    working_dir: /app
+    volumes:
+      - ./app:/app
+    networks:
+      - event-queue
+    depends_on:
+      - mongo
+      - rabbitmq
+
+  email:
+    container_name: email
+    image: node:16-alpine
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - 3001:3001
+    working_dir: /app
+    volumes:
+      - ./email:/app
+    networks:
+      - event-queue
+      - database
+    environment:
+      MONGO_DATABASE: ${MONGO_DATABASE}
+      MONGO_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_HOSTNAME: 'mongo'
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASS: ${MAIL_PASS}
+      MAIL_FROM: ${MAIL_FROM}
+    depends_on:
+      - mongo
+      - rabbitmq
+
+  mongo:
+    container_name: mongo
+    hostname: mongo
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - database
+
+  rabbitmq:
+    container_name: rabbitmq
+    hostname: rabbitmq
+    image: rabbitmq:3-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - rabbitmq-etc:/etc/rabbitmq/
+      - rabbitmq-data:/var/lib/rabbitmq/
+      - rabbitmq-logs:/var/log/rabbitmq/
+    networks:
+      - event-queue
+
+volumes:
+  mongo-data:
+  rabbitmq-etc:
+  rabbitmq-data:
+  rabbitmq-logs:
+
+networks:
+  event-queue:
+  database:

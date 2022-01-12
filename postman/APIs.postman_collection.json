@@ -1,0 +1,52 @@
+{
+	"info": {
+		"_postman_id": "3f22e29e-913c-49bf-9b9e-efbfb1a3a48c",
+		"name": "APIs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Send Email",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"to\": \"test@test.com\",\n  \"cc\": [\"test@email.com\"],\n  \"bcc\": [\"test@email.com\"],\n  \"subject\": \"This is email subject\",\n  \"message\": \"This is email message\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/email-hook",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"email-hook"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Emails",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{email_url}}/emails",
+					"host": [
+						"{{email_url}}"
+					],
+					"path": [
+						"emails"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
